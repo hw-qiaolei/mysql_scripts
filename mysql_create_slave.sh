@@ -10,7 +10,7 @@
 usage()
 {
   echo "Usage: $0 <master_host> <master_mysql_user> <master_mysql_password> <slave_host> <slave_host_user> <slave_host_password> <slave_server_id>"
-  echo "<slave_server_id> is an unsigned integer, it is unique to each slave and should not use 1 (1 is used by master)"
+  echo "<slave_server_id> is an unsigned integer, and is unique to each slave and should not use 1 (1 is used by master)"
 }
 
 if [ $# -ne 7 ]
