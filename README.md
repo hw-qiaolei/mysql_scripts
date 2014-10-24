@@ -74,15 +74,19 @@ https://github.com/dominictarr/JSON.sh
 
 First, donwload/clone the mysql_scripts project, and upload to somewhere(like /tmp) on the mysql master and slave host(they are not master and slave yet but you want to configure them to be).
 
-Second, move the files under mysql_scripts to /usr/sbin/rdb. Like:
+Second, move mysql_scripts to /usr/sbin/. For example:
 
-mv /tmp/mysql_scripts /usr/sbin/rdb
+mv /tmp/mysql_scripts /usr/sbin/
 
 Or:
 
-mkdir -p /usr/sbin/rdb
+mkdir -p /usr/sbin/mysql_scripts
 
-cp -p /tmp/mysql_scripts/* /usr/sbin/rdb
+cp -p /tmp/mysql_scripts/* /usr/sbin/mysql_scripts
+
+Third, add executable permissions to shell scripts under /usr/sbin/mysql_scripts:
+
+chmod +x /usr/sbin/mysql_scripts/*.sh
 
 Then you can use these scripts. For example, if you want to create a slave, on master host, you can run "/usr/sbin/rdb/mysql_create_slave.sh" to get the usage of this script:
 

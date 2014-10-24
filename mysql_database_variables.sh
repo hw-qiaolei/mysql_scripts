@@ -17,7 +17,7 @@ if [ $# -ne 2 ];then
   exit 1
 fi
 
-LOG_FILE=/tmp/itchazuo_rdb.log
+LOG_FILE=/tmp/mysql_scripts.log
 if [ ! -f $LOG_FILE ];then
   touch $LOG_FILE
 fi
