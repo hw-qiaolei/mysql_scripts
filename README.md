@@ -4,7 +4,7 @@ This is a bunch of scripts developed for creating a mysql slave from scratch as 
 
 For example, using mysql_create_slave.sh you can create a slave from scratch in several seconds.
 
-The word "scratch" here means: you ONLY have to configure the network(IP address) properly for the mysql master and slave host, and install related software(mysql-libs, mysql, mysql-server) on each host.
+The word "scratch" here means: you ONLY have to configure the network(IP address) properly for the mysql master and slave host, and install related mysql software(at least mysql-libs, mysql, mysql-server) on each host.
 
 You do NOT need to do any things else, such as:
 * establish the trust relationship between the hosts
@@ -17,7 +17,7 @@ You do NOT need to do any things else, such as:
 * restart mysqld service
 * etc
 
-The result returned by each script is in JSON format. In case you call these scripts remotely and want to get the JSON formated result, you should modify these scripts by redirecting the output from standard output to a file, or simply comment these lines. For example:
+The result returned by each script is in JSON format. In case you call these scripts remotely and want to get the JSON formated result, you SHOULD modify these scripts by redirecting the output from standard output to a file, or simply comment these lines. For example:
 
 (1) modify lines like "echo "xxx" | tee -a $LOG_FILE" to "echo "xxx" >$LOG_FILE";
 
@@ -25,9 +25,9 @@ The result returned by each script is in JSON format. In case you call these scr
 
 The functionality of each script is self-explanatory.
 
-Note 1: you should use default mysql installation.
+Note 1: you MUST use default mysql installation.
 
-Note 2: by default databases except "performance_schema" and "information_schema" are replicated. you should modify /etc/my.cnf manually if you want have more fine-grained control over replication.
+Note 2: by default databases except "performance_schema" and "information_schema" are replicated. you SHOULD modify /etc/my.cnf manually if you want have more fine-grained control over replication.
 
 
 2, prerequisites
@@ -54,7 +54,9 @@ Theses scripts MAY also behave correctly with other mysql versions, such as 5.x.
 
 (3) expect
 
-Automatic interaction is done by expect, so you MUST have expect installed.
+Automatic interaction is done by expect, so you MUST have expect installed on master host.
+
+The script will try to install expect if does not exist, but you MUST have a valid yum respository configured.
 
 On my testbed, the following version of expect is used:
 
@@ -74,19 +76,15 @@ https://github.com/dominictarr/JSON.sh
 
 First, donwload/clone the mysql_scripts project, and upload to somewhere(like /tmp) on the mysql master and slave host(they are not master and slave yet but you want to configure them to be).
 
-Second, move mysql_scripts to /usr/sbin/. For example:
+Second, move the files under mysql_scripts to /usr/sbin/rdb. Like:
 
-mv /tmp/mysql_scripts /usr/sbin/
+mv /tmp/mysql_scripts /usr/sbin/rdb
 
 Or:
 
-mkdir -p /usr/sbin/mysql_scripts
+mkdir -p /usr/sbin/rdb
 
-cp -p /tmp/mysql_scripts/* /usr/sbin/mysql_scripts
-
-Third, add executable permissions to shell scripts under /usr/sbin/mysql_scripts:
-
-chmod +x /usr/sbin/mysql_scripts/*.sh
+cp -p /tmp/mysql_scripts/* /usr/sbin/rdb
 
 Then you can use these scripts. For example, if you want to create a slave, on master host, you can run "/usr/sbin/rdb/mysql_create_slave.sh" to get the usage of this script:
 
