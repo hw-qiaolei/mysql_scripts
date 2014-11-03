@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Name		: mysql_create_slave.sh
-# Description	: create a slave
+# Name		: mysql_add_slave.sh
+# Description	: add a slave, skip master configurations
 # Author	: qiaolei
 # Date		: 2014/10/13
 # -----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ echo "creating slave{$SLAVE_HOST} for mysql master{$MASTER_HOST} with server id 
 
 
 # STEP 1
-echo -n -e "{\033[31m STEP 1/19  \033[0m: @{$MASTER_HOST}}: checking expect and try to install it if does not exist..."
+echo -n -e "{\033[31m STEP 1/16  \033[0m: @{$MASTER_HOST}}: checking expect and try to install it if does not exist..."
 
 rpm -q expect
 if [ $? -ne 0 ];then
@@ -73,7 +73,7 @@ echo
 
 
 # STEP 2
-echo -n -e "{\033[31m STEP 2/19  \033[0m: @{$MASTER_HOST}}: generating a ssh key pair if does not exist..."
+echo -n -e "{\033[31m STEP 2/16  \033[0m: @{$MASTER_HOST}}: generating a ssh key pair if does not exist..."
 
 $MYSQL_SCRIPTS_PATH/mysql_ssh_keygen.sh
 
@@ -82,7 +82,7 @@ echo
 
 
 # STEP 3
-echo -n -e "{\033[31m STEP 3/19 \033[0m: @{$MASTER_HOST}}: copying ssh public key id to remote host{$SLAVE_HOST}..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 3/16 \033[0m: @{$MASTER_HOST}}: copying ssh public key id to remote host{$SLAVE_HOST}..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_ssh_copyid.sh $SLAVE_HOST $SLAVE_HOST_USER $SLAVE_HOST_PASSWORD
 
@@ -91,7 +91,7 @@ echo
 
 
 # STEP 4
-echo -n -e "{\033[31m STEP 4/19 \033[0m: @{$MASTER_HOST}}: checking iptables status and try to stop it..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 4/16 \033[0m: @{$MASTER_HOST}}: checking iptables status and try to stop it..." | tee -a $LOG_FILE
 
 service iptables status
 if [ $? -eq 0 ];then
@@ -104,7 +104,7 @@ echo
 
 
 # STEP 5
-echo -n -e "{\033[31m STEP 5/19 \033[0m: @{$MASTER_HOST}}: checking mysqld status and try to start it if necessary..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 5/16 \033[0m: @{$MASTER_HOST}}: checking mysqld status and try to start it if necessary..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_service_action.sh status
 if [ $? -ne 0 ];then
@@ -116,16 +116,7 @@ echo
 
 
 # STEP 6
-echo -n -e "{\033[31m STEP 6/19 \033[0m: @{$MASTER_HOST}}: creating replication user and grant privileges..." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_create_replication_user.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD repl slavepass %
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
-
-# STEP 7
-echo -n -e "{\033[31m STEP 7/19 \033[0m: @{$MASTER_HOST}}: dumping mysql databases..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 6/16 \033[0m: @{$MASTER_HOST}}: dumping mysql databases..." | tee -a $LOG_FILE
 
 DUMPED_FILES=`$MYSQL_SCRIPTS_PATH/mysql_dump_databases.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD NULL`
 
@@ -133,8 +124,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 8
-echo -n -e "{\033[31m STEP 8/19 \033[0m: @{$MASTER_HOST}}: copying database files to remote host{$SLAVE_HOST}..." | tee -a $LOG_FILE
+# STEP 7
+echo -n -e "{\033[31m STEP 7/16 \033[0m: @{$MASTER_HOST}}: copying database files to remote host{$SLAVE_HOST}..." | tee -a $LOG_FILE
 
 DUMPED_FILES=`$MYSQL_SCRIPTS_PATH/mysql_get_value_by_key.sh dumped_files "$DUMPED_FILES"`
 DUMPED_FILES=${DUMPED_FILES//,/ }
@@ -146,26 +137,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 9
-echo -n -e "{\033[31m STEP 9/19 \033[0m: @{$MASTER_HOST}}: adding master configuration to /etc/my.cnf...." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_master_cnf.sh 1
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
-
-# STEP 10 
-echo -n -e "{\033[31m STEP 10/19 \033[0m: @{$MASTER_HOST}}: restarting mysqld service..." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
-
-# STEP 11
-echo -n -e "{\033[31m STEP 11/19 \033[0m: @{$MASTER_HOST}}: getting master status..." | tee -a $LOG_FILE
+# STEP 8
+echo -n -e "{\033[31m STEP 8/16 \033[0m: @{$MASTER_HOST}}: getting master status..." | tee -a $LOG_FILE
 
 MASTER_STATUS=`$MYSQL_SCRIPTS_PATH/mysql_master_status.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD`
 MASTER_LOG_FILE=`$MYSQL_SCRIPTS_PATH/mysql_get_value_by_key.sh File "$MASTER_STATUS"`
@@ -175,8 +148,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 12
-echo -n -e "{\033[31m STEP 12/19 \033[0m: @{$MASTER_HOST}}: getting all databases..." | tee -a $LOG_FILE
+# STEP 9
+echo -n -e "{\033[31m STEP 9/16 \033[0m: @{$MASTER_HOST}}: getting all databases..." | tee -a $LOG_FILE
 
 JSON_DATABASES=`$MYSQL_SCRIPTS_PATH/mysql_get_databases.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD`
 DATABASES=`$MYSQL_SCRIPTS_PATH/mysql_get_value_by_key.sh databases "$JSON_DATABASES"`
@@ -185,8 +158,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 13
-echo -n -e "{\033[31m STEP 13/19 \033[0m: @{$SLAVE_HOST}}: checking iptables status and try to stop it..." | tee -a $LOG_FILE
+# STEP 10
+echo -n -e "{\033[31m STEP 10/16 \033[0m: @{$SLAVE_HOST}}: checking iptables status and try to stop it..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "service iptables status;if [ "$?" = "0" ];then service iptables stop;chkconfig iptables off;fi"
 
@@ -194,8 +167,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 14
-echo -n -e "{\033[31m STEP 14/19 \033[0m: @{$SLAVE_HOST}}: checking mysqld status and try to start it if necessary..." | tee -a $LOG_FILE
+# STEP 11
+echo -n -e "{\033[31m STEP 11/16 \033[0m: @{$SLAVE_HOST}}: checking mysqld status and try to start it if necessary..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart"
 
@@ -203,8 +176,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 15
-echo -n -e "{\033[31m STEP 15/19 \033[0m: @{$SLAVE_HOST}}: creating databases if not exists..." | tee -a $LOG_FILE
+# STEP 12
+echo -n -e "{\033[31m STEP 12/16 \033[0m: @{$SLAVE_HOST}}: creating databases if not exists..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_create_databases.sh root NULL $DATABASES"
 
@@ -212,8 +185,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 16
-echo -n -e "{\033[31m STEP 16/19 \033[0m: @{$SLAVE_HOST}}: importing database files..." | tee -a $LOG_FILE
+# STEP 13
+echo -n -e "{\033[31m STEP 13/16 \033[0m: @{$SLAVE_HOST}}: importing database files..." | tee -a $LOG_FILE
 
 DB_NAME=""
 for f in $DUMPED_FILES;do
@@ -227,8 +200,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 17
-echo -n -e "{\033[31m STEP 17/19 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
+# STEP 14
+echo -n -e "{\033[31m STEP 14/16 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh root NULL"
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh root NULL"
@@ -239,8 +212,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 18
-echo -n -e "{\033[31m STEP 18/19 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
+# STEP 15
+echo -n -e "{\033[31m STEP 15/16 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_slave_cnf.sh $SLAVE_SERVER_ID"
 
@@ -248,8 +221,8 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 19
-echo -n -e "{\033[31m STEP 19/19 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
+# STEP 16
+echo -n -e "{\033[31m STEP 16/16 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart"
 
