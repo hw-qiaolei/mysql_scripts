@@ -24,12 +24,16 @@ if [ ! -f $LOG_FILE ];then
 fi
 
 TIMESTAMP=`date +%Y%m%d%H%M%S`
-echo "@$TIMESTAMP: {$0 $*}" | tee -a $LOG_FILE
+echo "@$TIMESTAMP: {$0 $*}" >$LOG_FILE
 
 USERNAME=$1
 PASSWORD=$2
 
-VERSION=`mysqladmin -u${USERNAME} -p${PASSWORD} version | grep "Server version" | awk '{print $3}'`
+if [ ! $PASSWORD = "NULL" ];then
+  VERSION=`mysqladmin -u${USERNAME} -p${PASSWORD} version | grep "Server version" | awk '{print $3}'`
+else
+  VERSION=`mysqladmin -u${USERNAME} version | grep "Server version" | awk '{print $3}'`
+fi
 
 RESULT=`printf "%s%s%s%s" "$RESULT" "{\"version\": " "\"$VERSION\"" "}"`
 
