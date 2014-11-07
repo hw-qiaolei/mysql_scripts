@@ -30,8 +30,10 @@ echo "@$TIMESTAMP: {$0 $*}" >$LOG_FILE
 USERNAME=$1
 PASSWORD=$2
 DATABASES=$3
+declare -a DATABASE_ARRAY
+
 if [ $DATABASES != "NULL" ];then
-  DATABASES=($(echo $3 | tr ',' ' ' | tr -s ' ')) 
+  DATABASE_ARRAY=($(echo $3 | tr ',' ' ' | tr -s ' ')) 
 else
   DATABASES=""
   TMP_DATABASES=/tmp/databases.tmp
@@ -42,15 +44,14 @@ else
   mysql -u root -e "show databases" > $TMP_DATABASES
 
   DBS=`cat $TMP_DATABASES | sed '1d'| tr -d "[|]" | awk '{print $1}' | grep -v "information_schema" | grep -v "performance_schema"`
+   
   for i in $DBS;do
     DATABASES=`printf "%s%s%s" "$DATABASES" "," "$i"`
   done
-
+  
   DATABASES=${DATABASES#,}   
+  DATABASE_ARRAY=(${DATABASES//,/ })
 fi
-
-declare -a DATABASE_ARRAY
-DATABASE_ARRAY=(${DATABASES//,/ })
 
 NUM_OF_DBS=${#DATABASE_ARRAY[@]}
 
