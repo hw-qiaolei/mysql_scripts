@@ -228,7 +228,25 @@ echo
 
 
 # STEP 17
-echo -n -e "{\033[31m STEP 17/19 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 17/19 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
+
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_slave_cnf.sh $SLAVE_SERVER_ID"
+
+echo -e "[\033[32m DONE \033[0m]"
+echo
+
+
+# STEP 18
+echo -n -e "{\033[31m STEP 18/19 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
+
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart"
+
+echo -e "[\033[32m DONE \033[0m]"
+echo
+
+
+# STEP 19
+echo -n -e "{\033[31m STEP 19/19 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh root NULL"
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh root NULL"
@@ -237,25 +255,6 @@ $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${
 
 echo -e "[\033[32m DONE \033[0m]"
 echo
-
-
-# STEP 18
-echo -n -e "{\033[31m STEP 18/19 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_slave_cnf.sh $SLAVE_SERVER_ID"
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
-
-# STEP 19
-echo -n -e "{\033[31m STEP 19/19 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart"
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
 
 RC=$?
 

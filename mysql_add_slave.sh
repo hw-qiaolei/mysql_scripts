@@ -201,19 +201,7 @@ echo
 
 
 # STEP 14
-echo -n -e "{\033[31m STEP 14/16 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
-
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh root NULL"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh root NULL"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_change_master.sh root NULL $MASTER_HOST repl slavepass $MASTER_LOG_FILE $MASTER_LOG_POS"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_start_slave.sh root NULL"
-
-echo -e "[\033[32m DONE \033[0m]"
-echo
-
-
-# STEP 15
-echo -n -e "{\033[31m STEP 15/16 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
+echo -n -e "{\033[31m STEP 14/16 \033[0m: @{$SLAVE_HOST}}: adding slave configuration to /etc/my.cnf..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_slave_cnf.sh $SLAVE_SERVER_ID"
 
@@ -221,10 +209,22 @@ echo -e "[\033[32m DONE \033[0m]"
 echo
 
 
-# STEP 16
-echo -n -e "{\033[31m STEP 16/16 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
+# STEP 15
+echo -n -e "{\033[31m STEP 15/16 \033[0m: @{$SLAVE_HOST}}: restart mysqld service..." | tee -a $LOG_FILE
 
 $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_service_action.sh restart"
+
+echo -e "[\033[32m DONE \033[0m]"
+echo
+
+
+# STEP 16
+echo -n -e "{\033[31m STEP 16/16 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
+
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh root NULL"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh root NULL"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_change_master.sh root NULL $MASTER_HOST repl slavepass $MASTER_LOG_FILE $MASTER_LOG_POS"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_start_slave.sh root NULL"
 
 echo -e "[\033[32m DONE \033[0m]"
 echo
