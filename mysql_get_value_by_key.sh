@@ -31,7 +31,7 @@ VALUE=""
 
 TMP_JSON_STRING=/tmp/json_string.tmp
 echo $JSON_STRING >$TMP_JSON_STRING
-VALUE=`/usr/sbin/rdb/JSON.sh <$TMP_JSON_STRING | grep "$KEY" | head -n 1 | awk '{print $2}'`
+VALUE=`/usr/sbin/mysql_scripts/JSON.sh <$TMP_JSON_STRING | grep "$KEY" | head -n 1 | awk '{print $2}'`
 VALUE=${VALUE#\"}
 VALUE=${VALUE%\"}
 

@@ -38,7 +38,7 @@ These scripts are developed on linux, on my testbed the following system is test
 
 CentOS release 6.5 (Final)
 
-These scripts MAY also behave correctly on other CentOS/RHEL systems.
+Theses scripts MAY also behave correctly on other CentOS/RHEL systems.
 
 (2) mysql
 
@@ -74,27 +74,23 @@ https://github.com/dominictarr/JSON.sh
 3, how to use
 =============
 
-First, download/clone the mysql_scripts project, and upload to somewhere(like /tmp) on the mysql master and slave host(they are not master and slave yet but you want to configure them to be).
+First, donwload/clone the mysql_scripts project, and upload to somewhere(like /tmp) on the mysql master and slave host(they are not master and slave yet but you want to configure them to be).
 
-Second, move the files under mysql_scripts to /usr/sbin/mysql_scripts. Like:
+Second, move the files under mysql_scripts to /usr/sbin/rdb. Like:
 
-mv /tmp/mysql_scripts /usr/sbin/
+mv /tmp/mysql_scripts /usr/sbin/rdb
 
 Or:
 
-mkdir -p /usr/sbin/mysql_scripts
+mkdir -p /usr/sbin/rdb
 
-cp -p /tmp/mysql_scripts/* /usr/sbin/mysql_scripts
+cp -p /tmp/mysql_scripts/* /usr/sbin/rdb
 
-Third, add executable permission to these shell scripts which are under /usr/sbin/mysql_scripts:
+Then you can use these scripts. For example, if you want to create a slave, on master host, you can run "/usr/sbin/rdb/mysql_create_slave.sh" to get the usage of this script:
 
-chmod +x /usr/sbin/mysql_scripts/*.sh
+[root@mysql-master ~]# /usr/sbin/rdb/mysql_create_slave.sh
 
-Then you can use these scripts. For example, if you want to create a slave, on master host, you can run "/usr/sbin/mysql_scripts/mysql_create_slave.sh" to get the usage of this script:
-
-[root@mysql-master ~]# /usr/sbin/mysql_scripts/mysql_create_slave.sh
-
-Usage: /usr/sbin/mysql_scripts/mysql_create_slave.sh [master_host] [master_mysql_user] [master_mysql_password] [slave_host] [slave_host_user] [slave_host_password] [slave_server_id]
+Usage: /usr/sbin/rdb/mysql_create_slave.sh [master_host] [master_mysql_user] [master_mysql_password] [slave_host] [slave_host_user] [slave_host_password] [slave_server_id]
 
 [slave_server_id] is an unsigned integer, and is unique to each slave and should not use 1 (1 is used by master)
 
@@ -108,7 +104,7 @@ Here are some explanation:
 * slave_host_password   : user's password of slave host
 * slave_server_id       : server id of slave, it is an unsigned integer, and is unique to each slave and should not use 1 (1 is used by master)
 
-Generally you can create a mysql slave within 20 seconds for an initial empty mysql installation.
+Generally you can create a mysql slave within 20 seconds for an initial mysql installation.
 
 
 4, contact me

@@ -34,11 +34,13 @@ TMP_MY_CNF_2=/tmp/my.cnf.2
 SERVER_ID="server-id=$ID"
 LOG_BIN="log-bin=mysql-bin"
 BINGLOG_FORMAT="binlog_format=mixed"
+FLUSH_AT_COMMIT="innodb_flush_log_at_trx_commit=1"  
+SYNC_BINLOG="sync_binlog=1"
 
 cp -p $MY_CNF /tmp/my.cnf-${TIMESTAMP}
 
-sed "/server-id/d" $MY_CNF | sed "/log-bin/d" | sed "/binlog_format/d" >$TMP_MY_CNF
-cat $TMP_MY_CNF | sed "/\[mysqld\]/a ${SERVER_ID}\n${LOG_BIN}\n${BINGLOG_FORMAT}" >$TMP_MY_CNF_2
+sed "/server-id/d" $MY_CNF | sed "/log-bin/d" | sed "/binlog_format/d" | sed "/innodb_flush_log_at_trx_commit/d" | sed "/SYNC_BINLOG/d" >$TMP_MY_CNF
+cat $TMP_MY_CNF | sed "/\[mysqld\]/a ${SERVER_ID}\n${LOG_BIN}\n${BINGLOG_FORMAT}\n${FLUSH_AT_COMMIT}\n${SYNC_BINLOG}" >$TMP_MY_CNF_2
 
 mv -f $TMP_MY_CNF_2 $MY_CNF
 

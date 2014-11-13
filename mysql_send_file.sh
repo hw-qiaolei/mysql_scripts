@@ -22,7 +22,7 @@ set remote_dir [lindex $argv 4]
 spawn /usr/bin/scp -pr $local_file $remote_user@$remote_host:$remote_dir
 
 expect {
-"(yes/no)?" {send "yes\r"; exp_continue}
+"*(yes/no)?" {send "yes\r"; exp_continue}
 "*password:" {send "$remote_password\r"}
 eof
 }

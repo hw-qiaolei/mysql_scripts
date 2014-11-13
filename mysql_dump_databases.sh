@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # Name		: mysql_databases.sh
-# Description	: dump the specified databases,except information_schema,performance_schema
+# Description	: dump the specified databases,except information_schema,performance_schema,mysql
 # Author	: qiaolei
 # Date		: 2014/10/13
 # -----------------------------------------------------------------------------
@@ -10,7 +10,7 @@
 usage()
 {
   echo "Usage: $0 <mysql_user> <mysql_password> <databases>"
-  echo "databases are seperated by comma(,), such as db1,db2,db3. NULL will dump all databases."
+  echo "databases are seperated by comma(,), such as db1,db2,db3. NULL will dump all databases except information_schema,performance_schema,mysql."
 }
 
 if [ $# -ne 3 ]
@@ -41,9 +41,13 @@ else
     touch $TMP_DATABASES
   fi
 
-  mysql -u root -e "show databases" > $TMP_DATABASES
+  if [ ! $PASSWORD = "NULL" ];then 
+    mysql -u$USERNAME -p$PASSWORD -e "show databases" > $TMP_DATABASES
+  else
+    mysql -u$USERNAME -e "show databases" > $TMP_DATABASES
+  fi
 
-  DBS=`cat $TMP_DATABASES | sed '1d'| tr -d "[|]" | awk '{print $1}' | grep -v "information_schema" | grep -v "performance_schema"`
+  DBS=`cat $TMP_DATABASES | sed '1d'| tr -d "[|]" | awk '{print $1}' | grep -v "information_schema" | grep -v "performance_schema" | grep -v "mysql"`
    
   for i in $DBS;do
     DATABASES=`printf "%s%s%s" "$DATABASES" "," "$i"`

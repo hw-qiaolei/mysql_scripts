@@ -20,10 +20,9 @@ set remote_password [lindex $argv 2]
 spawn /usr/bin/ssh-copy-id -i /root/.ssh/id_dsa.pub $remote_user@$remote_host
 
 expect {
-"(yes/no)?" {send "yes\r"; exp_continue}
+"*(yes/no)?" {send "yes\r"; exp_continue}
 "*password:" {send "$remote_password\r"}
 eof
 }
 
 # expect eof
-

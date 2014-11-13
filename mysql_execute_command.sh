@@ -21,7 +21,7 @@ set command [lindex $argv 3]
 spawn /usr/bin/ssh $remote_user@$remote_host $command
 
 expect {
-"(yes/no)?" {send "yes\r"; exp_continue}
+"*(yes/no)?" {send "yes\r"; exp_continue}
 "*password:" {send "$remote_password\r"}
 eof
 }
