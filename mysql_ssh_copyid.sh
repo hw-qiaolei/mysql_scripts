@@ -22,7 +22,7 @@ spawn /usr/bin/ssh-copy-id -i /root/.ssh/id_dsa.pub $remote_user@$remote_host
 expect {
 "*(yes/no)?" {send "yes\r"; exp_continue}
 "*password:" {send "$remote_password\r"}
-eof
+eof {exit 0}
 }
 
-# expect eof
+expect eof

@@ -24,8 +24,8 @@ spawn /usr/bin/scp -pr $local_file $remote_user@$remote_host:$remote_dir
 expect {
 "*(yes/no)?" {send "yes\r"; exp_continue}
 "*password:" {send "$remote_password\r"}
-eof
+eof {exit 0}
 }
 
-# expect eof
+expect eof
 
