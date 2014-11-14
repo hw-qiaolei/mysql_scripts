@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # Name		: mysql_get_databases.sh
-# Description	: get all mysql databases,except information_schema,performance_schema,mysql
+# Description	: get all mysql databases,except information_schema,performance_schema,mysql,test
 # Author	: qiaolei
 # Date		: 2014/10/13
 # -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ else
   mysql -u root -e "show databases" > $TMP_DATABASES
 fi
 
-DBS=`cat $TMP_DATABASES | sed '1d'| tr -d "[|]" | awk '{print $1}' | grep -v "information_schema" | grep -v "performance_schema" | grep -v "mysql"`
+DBS=`cat $TMP_DATABASES | sed '1d'| tr -d "[|]" | awk '{print $1}' | grep -v "^information_schema$" | grep -v "^performance_schema$" | grep -v "^mysql$" | grep -v "^test$"`
 for i in $DBS;do
   DATABASES=`printf "%s%s%s" "$DATABASES" "," "$i"`
 done

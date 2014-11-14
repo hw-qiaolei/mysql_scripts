@@ -9,11 +9,11 @@
 
 usage()
 {
-  echo "Usage: $0 <master_host> <master_mysql_user> <master_mysql_password> <slave_host> <slave_host_user> <slave_host_password> <slave_server_id>"
+  echo "Usage: $0 <master_host> <master_mysql_user> <master_mysql_password> <slave_host> <slave_host_user> <slave_host_password> <slave_mysql_user> <slave_mysql_password> <slave_server_id>"
   echo "<slave_server_id> is an unsigned integer, and is unique to each slave and should not use 1 (1 is used by master)"
 }
 
-if [ $# -ne 7 ]
+if [ $# -ne 9 ]
 then
   usage
   exit 1
@@ -43,10 +43,20 @@ fi
 
 SLAVE_HOST_PASSWORD=$6
 
-SLAVE_SERVER_ID=$7
+SLAVE_MYSQL_USER=$7
+if [ $SLAVE_MYSQL_USER = "NULL" ];then
+  SLAVE_MYSQL_USER ="root"
+fi
+
+SLAVE_MYSQL_PASSWORD=$8
+
+SLAVE_SERVER_ID=$9
 if [ $SLAVE_SERVER_ID = "NULL" ];then
   SLAVE_SERVER_ID="2"
 fi
+
+REPL_USER="repl"
+REPL_PASS="slavepass"
 
 MYSQL_SCRIPTS_PATH=/usr/sbin/mysql_scripts
 
@@ -118,7 +128,7 @@ echo
 # STEP 6
 echo -n -e "{\033[31m STEP 6/19 \033[0m: @{$MASTER_HOST}}: creating replication user and grant privileges..." | tee -a $LOG_FILE
 
-$MYSQL_SCRIPTS_PATH/mysql_create_replication_user.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD repl slavepass %
+$MYSQL_SCRIPTS_PATH/mysql_create_replication_user.sh $MASTER_MYSQL_USER $MASTER_MYSQL_PASSWORD $REPL_USER $REPL_PASS %
 
 echo -e "[\033[32m DONE \033[0m]"
 echo
@@ -206,7 +216,7 @@ echo
 # STEP 15
 echo -n -e "{\033[31m STEP 15/19 \033[0m: @{$SLAVE_HOST}}: creating databases if not exists..." | tee -a $LOG_FILE
 
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_create_databases.sh root NULL $DATABASES"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_create_databases.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD $DATABASES"
 
 echo -e "[\033[32m DONE \033[0m]"
 echo
@@ -220,7 +230,7 @@ for f in $DUMPED_FILES;do
   DB_NAME=$f
   DB_NAME=${DB_NAME//\//|}
   DB_NAME=`echo $DB_NAME | awk -F'|' '{print $3}' | awk -F'-' '{print $1}'`
-  $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_import_database.sh root NULL $DB_NAME $f"
+  $MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_import_database.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD $DB_NAME $f"
 done
 
 echo -e "[\033[32m DONE \033[0m]"
@@ -248,10 +258,10 @@ echo
 # STEP 19
 echo -n -e "{\033[31m STEP 19/19 \033[0m: @{$SLAVE_HOST}}: changing master and restart slave..." | tee -a $LOG_FILE
 
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh root NULL"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh root NULL"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_change_master.sh root NULL $MASTER_HOST repl slavepass $MASTER_LOG_FILE $MASTER_LOG_POS"
-$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_start_slave.sh root NULL"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_stop_slave.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_reset_slave.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_change_master.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD $MASTER_HOST $REPL_USER $REPL_PASS $MASTER_LOG_FILE $MASTER_LOG_POS"
+$MYSQL_SCRIPTS_PATH/mysql_execute_command.sh ${SLAVE_HOST} ${SLAVE_HOST_USER} ${SLAVE_HOST_PASSWORD} "$MYSQL_SCRIPTS_PATH/mysql_start_slave.sh $SLAVE_MYSQL_USER $SLAVE_MYSQL_PASSWORD"
 
 echo -e "[\033[32m DONE \033[0m]"
 echo

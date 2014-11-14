@@ -34,12 +34,16 @@ SERVER_ID="server-id=$ID"
 LOG_SLAVE_UPDATES="log-slave-updates"
 LOG_BIN="log-bin=mysql-bin"
 RELAY_LOG="relay-log=slave-relay-bin"
-BINGLOG_FORMAT="binlog_format=mixed"
+BINGLOG_FORMAT="binlog_format=ROW"
+REPL_IGNORE_DB_MYSQL="replicate_ignore_db=mysql"
+REPL_IGNORE_DB_TEST="replicate_ignore_db=test"
+REPL_IGNORE_DB_INFORMATION="replicate_ignore_db=information_schema"
+REPL_IGNORE_DB_PERFORMANCE="replicate_ignore_db=performance_schema"
 
 cp -p $MY_CNF /tmp/my.cnf-${TIMESTAMP}
 
-sed "/server-id/d" $MY_CNF | sed "/log-slave-updates/d" | sed "/log-bin/d" | sed "/relay-log/d" | sed "/binlog_format/d" >$TMP_MY_CNF
-cat $TMP_MY_CNF | sed "/\[mysqld\]/a ${SERVER_ID}\n${LOG_SLAVE_UPDATES}\n${LOG_BIN}\n${RELAY_LOG}\n${BINGLOG_FORMAT}" >$TMP_MY_CNF_2
+sed "/server-id/d" $MY_CNF | sed "/log-slave-updates/d" | sed "/log-bin/d" | sed "/relay-log/d" | sed "/binlog_format/d" | sed "/replicate-ignore-db/d" >$TMP_MY_CNF
+cat $TMP_MY_CNF | sed "/\[mysqld\]/a ${SERVER_ID}\n${LOG_SLAVE_UPDATES}\n${LOG_BIN}\n${RELAY_LOG}\n${BINGLOG_FORMAT}\n${REPL_IGNORE_DB_MYSQL}\n${REPL_IGNORE_DB_TEST}\n${REPL_IGNORE_DB_INFORMATION}\n${REPL_IGNORE_DB_PERFORMANCE}" >$TMP_MY_CNF_2
 
 mv -f $TMP_MY_CNF_2 $MY_CNF
 
